@@ -8,11 +8,14 @@ let
   cfg = config.services.openbao;
 
   settingsFormat = pkgs.formats.json { };
+
+  configFile = settingsFormat.generate "openbao.hcl.json" cfg.settings;
 in
 {
   options = {
     services.openbao = {
       enable = lib.mkEnableOption "OpenBao daemon";
+      enableReload = lib.mkEnableOption "reload on config file change";
 
       package = lib.mkPackageOption pkgs "openbao" {
         example = "pkgs.openbao.override { withHsm = false; withUi = false; }";
@@ -96,12 +99,17 @@ in
   config = lib.mkIf cfg.enable {
     environment.systemPackages = [ cfg.package ];
 
+    environment.etc."/openbao/openbao.hcl.json" = lib.mkIf cfg.enableReload {
+      source = configFile;
+    };
+
     systemd.services.openbao = {
       description = "OpenBao - A tool for managing secrets";
 
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
 
+      reloadTriggers = lib.optional cfg.enableReload configFile;
       restartIfChanged = false; # do not restart on "nixos-rebuild switch". It would seal the storage and disrupt the clients.
 
       serviceConfig = {
@@ -112,7 +120,7 @@ in
             (lib.getExe cfg.package)
             "server"
             "-config"
-            (settingsFormat.generate "openbao.hcl.json" cfg.settings)
+            (if cfg.enableReload then "/etc/openbao/openbao.hcl.json" else configFile)
           ]
           ++ cfg.extraArgs
         );

@@ -19,6 +19,7 @@ in
 
       services.openbao = {
         enable = true;
+        enableReload = true;
 
         settings = {
           ui = true;
@@ -45,6 +46,15 @@ in
       environment.variables = {
         BAO_ADDR = config.services.openbao.settings.api_addr;
         BAO_FORMAT = "json";
+      };
+
+      specialisation.reloadSystem.configuration = {
+        services.openbao.settings.listener.reloadable = {
+          type = "tcp";
+          address = "127.0.0.1:8202";
+
+          tls_disable = true;
+        };
       };
     };
 
@@ -101,5 +111,14 @@ in
       with subtest("Read a secret from cubbyhole"):
         read_output = json.loads(machine.succeed("bao read cubbyhole/my-secret"))
         assert read_output["data"]["my-value"] == "s3cr3t"
+
+      with subtest("config is reloaded on nixos-rebuild switch"):
+          machine.fail("curl -L --fail --show-error --silent http://127.0.0.1:8202 | grep '<title>OpenBao</title>'")
+          machine.succeed(
+              "${nodes.machine.system.build.toplevel}/specialisation/reloadSystem/bin/switch-to-configuration test >&2"
+          )
+          machine.wait_for_open_port(8202)
+          machine.succeed("journalctl -u openbao | grep -q 'OpenBao reload triggered'")
+          machine.succeed("curl -L --fail --show-error --silent http://127.0.0.1:8202 | grep '<title>OpenBao</title>'")
     '';
 }
