@@ -3,6 +3,8 @@
 npmConfigHook() {
     echo "Executing npmConfigHook"
 
+    set -x
+
     if [ -n "${npmRoot-}" ]; then
       pushd "$npmRoot"
     fi
@@ -64,6 +66,7 @@ npmConfigHook() {
       popd
     fi
 
+    set +x
     echo "Finished npmConfigHook"
 }
 
