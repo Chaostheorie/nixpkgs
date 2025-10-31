@@ -196,6 +196,26 @@ let
         inherit llvm_meta;
       };
 
+      tblgen = callPackage ../common/tblgen.nix {
+        inherit llvm_meta;
+
+        patches =
+          builtins.filter
+            # Crude method to drop polly patches if present, they're not needed for tblgen.
+            (p: (!lib.hasInfix "-polly" p))
+            tools.libllvm.patches;
+        clangPatches = [
+          # Would take tools.libclang.patches, but this introduces a cycle due
+          # to replacements depending on the llvm outpath (e.g. the LLVMgold patch).
+          # So take the only patch known to be necessary.
+          ./clang/gnu-install-dirs.patch
+
+          # Fixes llvm17 tblgen builds on aarch64.
+          # https://github.com/llvm/llvm-project/issues/106521#issuecomment-2337175680
+          ./clang/aarch64-tblgen.patch
+        ];
+      };
+
       lldb = callPackage ../common/lldb.nix {
         src = callPackage (
           { runCommand }:
