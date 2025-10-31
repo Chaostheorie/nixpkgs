@@ -211,8 +211,9 @@ let
           ./clang/gnu-install-dirs.patch
 
           # Fixes llvm17 tblgen builds on aarch64.
+          # NOTE: we don't need aarch for now
           # https://github.com/llvm/llvm-project/issues/106521#issuecomment-2337175680
-          ./clang/aarch64-tblgen.patch
+          # (builtins.toString ./clang/aarch64-tblgen.patch)
         ];
       };
 
