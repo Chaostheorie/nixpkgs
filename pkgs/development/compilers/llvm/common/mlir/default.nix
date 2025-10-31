@@ -54,11 +54,14 @@ stdenv.mkDerivation rec {
     "-DMLIR_TOOLS_INSTALL_DIR=${placeholder "out"}/bin/"
     "-DLLVM_ENABLE_IDE=OFF"
     "-DLLD_INSTALL_PACKAGE_DIR=${placeholder "out"}/lib/cmake/mlir"
+    "-DMLIR_INSTALL_CMAKE_DIR=${placeholder "dev"}/lib/cmake/mlir"
     "-DLLVM_BUILD_TESTS=${if doCheck then "ON" else "OFF"}"
     "-DLLVM_ENABLE_FFI=ON"
     "-DLLVM_HOST_TRIPLE=${stdenv.hostPlatform.config}"
     "-DLLVM_DEFAULT_TARGET_TRIPLE=${stdenv.hostPlatform.config}"
     "-DLLVM_ENABLE_DUMP=ON"
+    "-DLLVM_TABLEGEN_EXE=${buildLlvmTools.tblgen}/bin/llvm-tblgen"
+    "-DMLIR_TABLEGEN_EXE=${buildLlvmTools.tblgen}/bin/mlir-tblgen"
     (lib.cmakeBool "LLVM_BUILD_LLVM_DYLIB" (!stdenv.hostPlatform.isStatic))
   ]
   ++ lib.optionals stdenv.hostPlatform.isStatic [
