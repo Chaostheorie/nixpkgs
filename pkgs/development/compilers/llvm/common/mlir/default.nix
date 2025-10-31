@@ -59,6 +59,7 @@ stdenv.mkDerivation rec {
     "-DLLVM_HOST_TRIPLE=${stdenv.hostPlatform.config}"
     "-DLLVM_DEFAULT_TARGET_TRIPLE=${stdenv.hostPlatform.config}"
     "-DLLVM_ENABLE_DUMP=ON"
+    (lib.cmakeBool "LLVM_BUILD_LLVM_DYLIB" (!stdenv.hostPlatform.isStatic))
   ]
   ++ lib.optionals stdenv.hostPlatform.isStatic [
     # Disables building of shared libs, -fPIC is still injected by cc-wrapper
