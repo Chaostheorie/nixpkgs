@@ -197,17 +197,18 @@ stdenv.mkDerivation (
               stripLen = 1;
             }
           )
-      ++
-        lib.optional (lib.versionAtLeast release_version "12" && lib.versionOlder release_version "19")
-          # Add missing include headers to build against gcc-15:
-          #   https://github.com/llvm/llvm-project/pull/101761
-          (
-            fetchpatch {
-              url = "https://github.com/llvm/llvm-project/commit/7e44305041d96b064c197216b931ae3917a34ac1.patch";
-              hash = "sha256-1htuzsaPHbYgravGc1vrR8sqpQ/NSQ8PUZeAU8ucCFk=";
-              stripLen = 1;
-            }
-          )
+      # TODO: figure out if this needs a port
+      # ++
+      #   lib.optional (lib.versionAtLeast release_version "12" && lib.versionOlder release_version "19")
+      #     # Add missing include headers to build against gcc-15:
+      #     #   https://github.com/llvm/llvm-project/pull/101761
+      #     (
+      #       fetchpatch {
+      #         url = "https://github.com/llvm/llvm-project/commit/7e44305041d96b064c197216b931ae3917a34ac1.patch";
+      #         hash = "sha256-1htuzsaPHbYgravGc1vrR8sqpQ/NSQ8PUZeAU8ucCFk=";
+      #         stripLen = 1;
+      #       }
+      #     )
       ++
         lib.optional (lib.versionOlder release_version "16")
           # Fix musl build.
@@ -248,18 +249,18 @@ stdenv.mkDerivation (
               hash = "sha256-Ot45P/iwaR4hkcM3xtLwfryQNgHI6pv6ADjv98tgdZA=";
             })
           ]
-      ++
-        lib.optional (lib.versions.major release_version == "17")
-          # Fixes a crash with -fzero-call-used-regs=used-gpr
-          # See also https://github.com/llvm/llvm-project/issues/75168
-          (
-            fetchpatch {
-              name = "fix-fzero-call-used-regs.patch";
-              url = "https://github.com/llvm/llvm-project/commit/f800c1f3b207e7bcdc8b4c7192928d9a078242a0.patch";
-              stripLen = 1;
-              hash = "sha256-e8YKrMy2rGcSJGC6er2V66cOnAnI+u1/yImkvsRsmg8=";
-            }
-          )
+      # ++
+      #   lib.optional (lib.versions.major release_version == "17")
+      #     # Fixes a crash with -fzero-call-used-regs=used-gpr
+      #     # See also https://github.com/llvm/llvm-project/issues/75168
+      #     (
+      #       fetchpatch {
+      #         name = "fix-fzero-call-used-regs.patch";
+      #         url = "https://github.com/llvm/llvm-project/commit/f800c1f3b207e7bcdc8b4c7192928d9a078242a0.patch";
+      #         stripLen = 1;
+      #         hash = "sha256-e8YKrMy2rGcSJGC6er2V66cOnAnI+u1/yImkvsRsmg8=";
+      #       }
+      #     )
       ++ lib.optionals (lib.versions.major release_version == "18") [
         # Reorgs one test so the next patch applies
         (fetchpatch {
@@ -277,16 +278,6 @@ stdenv.mkDerivation (
           hash = "sha256-fqw5gTSEOGs3kAguR4tINFG7Xja1RAje+q67HJt2nGg=";
         })
       ]
-      ++
-        lib.optionals (lib.versionAtLeast release_version "17" && lib.versionOlder release_version "19")
-          [
-            # Fixes test-suite on glibc 2.40 (https://github.com/llvm/llvm-project/pull/100804)
-            (fetchpatch {
-              url = "https://github.com/llvm/llvm-project/commit/1e8df9e85a1ff213e5868bd822877695f27504ad.patch";
-              hash = "sha256-mvBlG2RxpZPFnPI7jvCMz+Fc8JuM15Ye3th1FVZMizE=";
-              stripLen = 1;
-            })
-          ]
       ++ lib.optionals enablePolly [
         # Just like the `gnu-install-dirs` patch, but for `polly`.
         (getVersionFile "llvm/gnu-install-dirs-polly.patch")

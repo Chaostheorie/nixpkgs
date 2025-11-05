@@ -67,6 +67,7 @@ let
         chmod u+rwX -R .
         for p in ${toString clangPatches}
         do
+          echo "Applying clang patch $p"
           patch -p1 < $p
         done
       )
