@@ -152,6 +152,7 @@ stdenv.mkDerivation (
       ])
       ++ [
         (lib.cmakeBool "CLANGD_BUILD_XPC" false)
+        (lib.cmakeBool "CLANGD_DECISION_FOREST" false) # not present in our snapshot
         (lib.cmakeBool "LLVM_ENABLE_RTTI" true)
         (lib.cmakeFeature "LLVM_TABLEGEN_EXE" "${buildLlvmTools.tblgen}/bin/llvm-tblgen")
         (lib.cmakeFeature "CLANG_TABLEGEN" "${buildLlvmTools.tblgen}/bin/clang-tblgen")
