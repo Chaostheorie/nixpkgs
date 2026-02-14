@@ -224,7 +224,6 @@ stdenv.mkDerivation {
     homepage = "https://checkmk.com/";
     license = lib.licenses.gpl2Only;
     maintainers = with lib.maintainers; [
-      cobalt
       weriomat
     ];
     platforms = lib.platforms.linux;

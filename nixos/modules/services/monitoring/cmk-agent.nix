@@ -61,7 +61,6 @@ in
   };
 
   meta.maintainers = with lib.maintainers; [
-    cobalt
     weriomat
   ];
 }

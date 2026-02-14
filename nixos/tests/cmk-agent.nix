@@ -2,7 +2,6 @@
 {
   name = "cmk-agent-nixos";
   meta.maintainers = with pkgs.lib.maintainers; [
-    cobalt
     weriomat
   ];
   nodes.server =
